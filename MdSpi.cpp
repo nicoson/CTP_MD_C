@@ -54,7 +54,7 @@ void CMdSpi::ReqUserLogin()
 	strcpy(req.UserID, INVESTOR_ID);
 	strcpy(req.Password, PASSWORD);
 	int iResult = pUserApi->ReqUserLogin(&req, ++iRequestID);
-	cerr << "--->>> 发送用户登录请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
+	cerr << "--->>> Request for User Login: " << ((iResult == 0) ? "Success" : "Failed") << endl;
 }
 
 void CMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
@@ -64,7 +64,7 @@ void CMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 	if (bIsLast && !IsErrorRspInfo(pRspInfo))
 	{
 		///获取当前交易日
-		cerr << "--->>> 获取当前交易日 = " << pUserApi->GetTradingDay() << endl;
+		cerr << "--->>> Get Current Trading Date = " << pUserApi->GetTradingDay() << endl;
 		// 请求订阅行情
 		SubscribeMarketData();	
 
@@ -74,7 +74,7 @@ void CMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 void CMdSpi::SubscribeMarketData()
 {
 	int iResult = pUserApi->SubscribeMarketData(ppInstrumentID, iInstrumentID);
-	cerr << "--->>> 发送行情订阅请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
+	cerr << "--->>> Request for Market Data Subscription: " << ((iResult == 0) ? "Success" : "Failed") << endl;
 }
 
 void CMdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -95,7 +95,7 @@ void CMdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDa
 {
 	
 	//cerr << __FUNCTION__ << endl;
-	cerr << "--->>> " << pDepthMarketData->InstrumentID << "： LastPrice=" << pDepthMarketData->LastPrice << endl;
+	cerr << "--->>> " << pDepthMarketData->InstrumentID << ": LastPrice=" << pDepthMarketData->LastPrice << endl;
 	
 	string s = "C:\\Projects\\CTP\\Data\\" ;
 	s.append(pDepthMarketData->InstrumentID);
