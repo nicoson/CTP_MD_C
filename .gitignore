@@ -1,0 +1,8 @@
+testMdUserApi.VC.db
+/Debug/
+/Release/
+/.vs/
+/ipch/
+/Bin/testMdUserApi.exe
+/Bin/testMdUserApi.ilk
+/Bin/testMdUserApi.pdb
