@@ -24,6 +24,9 @@
     <ClCompile Include="testMdApi.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="DBCon.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MdSpi.h">
@@ -42,6 +45,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="ThostTraderApi\ThostFtdcUserApiStruct.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DBCon.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
