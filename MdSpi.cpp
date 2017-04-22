@@ -1,5 +1,6 @@
 #include "MdSpi.h"
 #include <iostream>
+#include "DBCon.h"
 
 
 using namespace std;
@@ -16,6 +17,9 @@ extern TThostFtdcInvestorIDType INVESTOR_ID;
 extern TThostFtdcPasswordType	PASSWORD;
 extern char* ppInstrumentID[];	
 extern int iInstrumentID;
+
+//	connect mysql server
+extern dbconnect _connector;
 
 // «Î«Û±‡∫≈
 extern int iRequestID;
@@ -94,20 +98,24 @@ using namespace std;
 void CMdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
 	
-	//cerr << __FUNCTION__ << endl;
-	cerr << "--->>> " << pDepthMarketData->InstrumentID << ": LastPrice=" << pDepthMarketData->LastPrice << endl;
+		//cerr << __FUNCTION__ << endl;
+		//cerr << "--->>> " << pDepthMarketData->InstrumentID << ": LastPrice=" << pDepthMarketData->LastPrice << endl;
 	
-	string s = "C:\\Projects\\CTP\\Data\\" ;
-	s.append(pDepthMarketData->InstrumentID);
-	s.append(".csv");
+		//	save data as csv file
+		//string s = "C:\\Projects\\CTP\\Data\\" ;
+		//s.append(pDepthMarketData->InstrumentID);
+		//s.append(".csv");
 
-	ofstream outfile;
-	outfile.open(s, ios::app);
-	outfile << pDepthMarketData->InstrumentID<<","<< pDepthMarketData->UpdateTime<<"."<< pDepthMarketData->UpdateMillisec<<","<< pDepthMarketData->LastPrice
-		<< "," << pDepthMarketData-> Volume << "," << pDepthMarketData-> BidPrice1 << "," << pDepthMarketData-> BidVolume1 << "," << pDepthMarketData-> AskPrice1 
-		<< "," << pDepthMarketData-> AskVolume1 << "," << pDepthMarketData-> OpenInterest << "," << pDepthMarketData->Turnover<< endl;
+		//ofstream outfile;
+		//outfile.open(s, ios::app);
+		//outfile << pDepthMarketData->InstrumentID<<","<< pDepthMarketData->UpdateTime<<"."<< pDepthMarketData->UpdateMillisec<<","<< pDepthMarketData->LastPrice
+		//	<< "," << pDepthMarketData-> Volume << "," << pDepthMarketData-> BidPrice1 << "," << pDepthMarketData-> BidVolume1 << "," << pDepthMarketData-> AskPrice1 
+		//	<< "," << pDepthMarketData-> AskVolume1 << "," << pDepthMarketData-> OpenInterest << "," << pDepthMarketData->Turnover<< endl;
 
-	outfile.close();
+		//outfile.close();
+
+	//	save data in mysql database
+	_connector.insertData(pDepthMarketData);
 }
 
 bool CMdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
