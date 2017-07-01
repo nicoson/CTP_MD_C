@@ -1,22 +1,6 @@
-﻿/* Copyright 2008, 2010, Oracle and/or its affiliates. All rights reserved.
+﻿/* Copyright 2017, Oracle and/or its affiliates. All rights reserved.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; version 2 of the License.
-
-There are special exceptions to the terms and conditions of the GPL
-as it is applied to this software. View the full text of the
-exception in file EXCEPTIONS-CONNECTOR-C++ in the directory of this
-software distribution.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+This program is used to establish a connection with database
 */
 
 /* Standard C++ includes */
@@ -78,8 +62,11 @@ dbconnect::~dbconnect(void) {
 
 void dbconnect::insertData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	try {
+		//	check whether the related product is already existed in current database, if not then create new table
+		checkAndCreateTable(pDepthMarketData->InstrumentID);
+
 		char query[2000];
-		sprintf(query, "INSERT INTO market(\
+		sprintf(query, "INSERT INTO %s (\
 				TradingDay, InstrumentID, ExchangeID, ExchangeInstID, LastPrice, PreSettlementPrice, PreClosePrice, \
 				PreOpenInterest, OpenPrice, HighestPrice, LowestPrice, Volume, Turnover, OpenInterest, ClosePrice, \
 				SettlementPrice, UpperLimitPrice, LowerLimitPrice, PreDelta, CurrDelta, UpdateTime, UpdateMillisec, \
@@ -96,6 +83,7 @@ void dbconnect::insertData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 				%.2f, %d, %.2f, %d, \
 				%.2f, '%s'\
 			)"\
+			, pDepthMarketData->InstrumentID
 			, dataValidate(pDepthMarketData->TradingDay), dataValidate(pDepthMarketData->InstrumentID), dataValidate(pDepthMarketData->ExchangeID), dataValidate(pDepthMarketData->ExchangeInstID), dataValidate(pDepthMarketData->LastPrice), dataValidate(pDepthMarketData->PreSettlementPrice), dataValidate(pDepthMarketData->PreClosePrice)
 			, dataValidate(pDepthMarketData->PreOpenInterest), dataValidate(pDepthMarketData->OpenPrice), dataValidate(pDepthMarketData->HighestPrice), dataValidate(pDepthMarketData->LowestPrice), dataValidate(pDepthMarketData->Volume), dataValidate(pDepthMarketData->Turnover), dataValidate(pDepthMarketData->OpenInterest), dataValidate(pDepthMarketData->ClosePrice)
 			, dataValidate(pDepthMarketData->SettlementPrice), dataValidate(pDepthMarketData->UpperLimitPrice), dataValidate(pDepthMarketData->LowerLimitPrice), dataValidate(pDepthMarketData->PreDelta), dataValidate(pDepthMarketData->CurrDelta), dataValidate(pDepthMarketData->UpdateTime), dataValidate(pDepthMarketData->UpdateMillisec)
@@ -105,7 +93,7 @@ void dbconnect::insertData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 			, dataValidate(pDepthMarketData->AveragePrice), dataValidate(pDepthMarketData->ActionDay)
 		);
 
-		res = stmt->executeQuery(query);
+		stmt->execute(query);
 
 		cout << "--->>> " << pDepthMarketData->InstrumentID << ": LastPrice=" << pDepthMarketData->LastPrice << endl;
 
@@ -132,4 +120,57 @@ char* dbconnect::dataValidate(char *data) {
 	if (strcmp(data, "") == 0)
 		strcpy(data, "NULL");
 	return data;
+}
+
+void dbconnect::checkAndCreateTable(char *InstrumentID) {
+	char query[2000];
+	sprintf(query, "CREATE TABLE IF NOT EXISTS %s (\
+	pid INT(11) NOT NULL PRIMARY KEY auto_increment,\
+	TradingDay DATE,\
+	InstrumentID VARCHAR(31),\
+	ExchangeID VARCHAR(9),\
+	ExchangeInstID VARCHAR(31),\
+	LastPrice DECIMAL(16,2),\
+	PreSettlementPrice DECIMAL(16,2),\
+	PreClosePrice DECIMAL(16,2),\
+	PreOpenInterest DECIMAL(16,2),\
+	OpenPrice DECIMAL(16,2),\
+	HighestPrice DECIMAL(16,2),\
+	LowestPrice DECIMAL(16,2),\
+	Volume INT(11),\
+	Turnover DECIMAL(16,2),\
+	OpenInterest DECIMAL(16,2),\
+	ClosePrice DECIMAL(16,2),\
+	SettlementPrice DECIMAL(16,2),\
+	UpperLimitPrice DECIMAL(16,2),\
+	LowerLimitPrice DECIMAL(16,2),\
+	PreDelta DECIMAL(16,2),\
+	CurrDelta DECIMAL(16,2),\
+	UpdateTime VARCHAR(9),\
+	UpdateMillisec INT(11),\
+	BidPrice1 DECIMAL(16,2),\
+	BidVolume1 INT(11),\
+	AskPrice1 DECIMAL(16,2),\
+	AskVolume1 INT(11),\
+	BidPrice2 DECIMAL(16,2),\
+	BidVolume2 INT(11),\
+	AskPrice2 DECIMAL(16,2),\
+	AskVolume2 INT(11),\
+	BidPrice3 DECIMAL(16,2),\
+	BidVolume3 INT(11),\
+	AskPrice3 DECIMAL(16,2),\
+	AskVolume3 INT(11),\
+	BidPrice4 DECIMAL(16,2),\
+	BidVolume4 INT(11),\
+	AskPrice4 DECIMAL(16,2),\
+	AskVolume4 INT(11),\
+	BidPrice5 DECIMAL(16,2),\
+	BidVolume5 INT(11),\
+	AskPrice5 DECIMAL(16,2),\
+	AskVolume5 INT(11),\
+	AveragePrice DECIMAL(16,2),\
+	ActionDay DATE\
+	)ENGINE = INNODB DEFAULT CHARSET = utf8; ", InstrumentID);
+
+	stmt->execute(query);
 }

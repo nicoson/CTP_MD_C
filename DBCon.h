@@ -48,6 +48,7 @@ public:
 	double dataValidate(double data);
 	int dataValidate(int data);
 	char* dataValidate(char *data);
+	void dbconnect::checkAndCreateTable(char *InstrumentID);
 
 private:
 	sql::SQLString DBURL;
