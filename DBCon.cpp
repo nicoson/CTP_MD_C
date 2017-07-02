@@ -22,6 +22,8 @@ headers from cppconn/ and mysql_driver.h + mysql_util.h
 #include <cppconn/statement.h>
 
 using namespace std;
+extern char* ppInstrumentID[];
+extern int iInstrumentID;
 
 dbconnect::dbconnect(sql::SQLString dburl, sql::SQLString username, sql::SQLString psd, sql::SQLString db, sql::SQLString table) {
 	DBURL = dburl;
@@ -66,7 +68,7 @@ void dbconnect::insertData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 		checkAndCreateTable(pDepthMarketData->InstrumentID);
 
 		char query[2000];
-		sprintf(query, "INSERT INTO %s (\
+		sprintf_s(query, sizeof(query), "INSERT INTO %s (\
 				TradingDay, InstrumentID, ExchangeID, ExchangeInstID, LastPrice, PreSettlementPrice, PreClosePrice, \
 				PreOpenInterest, OpenPrice, HighestPrice, LowestPrice, Volume, Turnover, OpenInterest, ClosePrice, \
 				SettlementPrice, UpperLimitPrice, LowerLimitPrice, PreDelta, CurrDelta, UpdateTime, UpdateMillisec, \
@@ -118,13 +120,40 @@ int dbconnect::dataValidate(int data) {
 
 char* dbconnect::dataValidate(char *data) {
 	if (strcmp(data, "") == 0)
-		strcpy(data, "NULL");
+		strcpy_s(data, sizeof(data), "NULL");
 	return data;
+}
+
+void dbconnect::getInstrumentList(char *table) {
+	char query[200];
+	sprintf_s(query, sizeof(query), "SELECT * FROM %s", table);
+	sql::ResultSet *results = stmt->executeQuery(query);
+	char nameStr[10];
+	char *p;
+	while (results->next()) {
+		string temp = results->getString(2).c_str();
+		//cout<<temp<<endl;
+
+		p = (char *)malloc(sizeof(nameStr));
+		sprintf_s(p, sizeof(nameStr), temp.c_str());
+		
+		ppInstrumentID[iInstrumentID] = p;
+		cout << ppInstrumentID[iInstrumentID] << endl;
+		//char temp2[] = *temp;
+		//strncpy(ppInstrumentID[iInstrumentID], temp.c_str(), strlen(temp.c_str()) + 1);
+		iInstrumentID++;
+	}
+	cout << iInstrumentID << endl;
+	//char *temp[] = { "ni1710", "rb1710" };
+	//return temp;
+	//ppInstrumentID[0] = "ni1710";
+	//ppInstrumentID[1] = "rb1710";
+
 }
 
 void dbconnect::checkAndCreateTable(char *InstrumentID) {
 	char query[2000];
-	sprintf(query, "CREATE TABLE IF NOT EXISTS %s (\
+	sprintf_s(query, sizeof(query), "CREATE TABLE IF NOT EXISTS %s (\
 	pid INT(11) NOT NULL PRIMARY KEY auto_increment,\
 	TradingDay DATE,\
 	InstrumentID VARCHAR(31),\

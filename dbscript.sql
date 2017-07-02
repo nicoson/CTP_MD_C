@@ -99,3 +99,12 @@ CREATE TABLE IF NOT EXISTS market(
 	#业务日期
 	ActionDay DATE
 )ENGINE=INNODB DEFAULT CHARSET=utf8;
+
+
+
+CREATE TABLE IF NOT EXISTS InstrumentList(
+	#primary key
+	pid INT(11) NOT NULL PRIMARY KEY auto_increment,
+	#合约代码
+	InstrumentID VARCHAR(31)
+)ENGINE=INNODB DEFAULT CHARSET=utf8;

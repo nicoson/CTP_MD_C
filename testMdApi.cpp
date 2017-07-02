@@ -18,8 +18,8 @@ TThostFtdcPasswordType  PASSWORD = "simnow";			// 注意这里输入你自己的用户密码
 //	connect mysql server
 dbconnect _connector("tcp://127.0.0.1:3306", "root", "root", "test", "student");
 
-char *ppInstrumentID[] = {"ni1710", "rb1710"};			// 行情订阅列表，注意，这个合约ID会过时的，注意与时俱进修改
-int iInstrumentID = 2;									// 行情订阅数量
+char *ppInstrumentID[1000] = { NULL };// = getInstrumentList("InstrumentList");// {"ni1710", "rb1710"};			// 行情订阅列表，注意，这个合约ID会过时的，注意与时俱进修改
+int iInstrumentID = 0;									// 行情订阅数量
 
 
 // 请求编号
@@ -27,6 +27,13 @@ int iRequestID = 0;
 
 void main(void)
 {
+	//char **aa = _connector.getInstrumentList("InstrumentList");
+	//ppInstrumentID = aa;
+	_connector.getInstrumentList("InstrumentList");
+
+	cout << "----> Test: " << iInstrumentID;
+	cout << "---> Test results: " << ppInstrumentID[3] << endl;
+
 	// 初始化UserApi
 	pUserApi = CThostFtdcMdApi::CreateFtdcMdApi();			// 创建UserApi
 	CThostFtdcMdSpi* pUserSpi = new CMdSpi();
